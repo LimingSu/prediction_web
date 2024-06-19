@@ -3,28 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display Image Example</title>
+    <title>Decision Tree Classifier for MCR</title>
     <style>
-        /* 可选的样式，确保图片适合屏幕显示 */
-        img {
-            max-width: 100%; /* 让图片宽度不超过容器宽度 */
-            height: auto; /* 高度自动调整以保持图片比例 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: url('figure.jpg') no-repeat center center fixed;  /* 使用相对路径指向同一文件夹中的图片 */
+            background-size: cover;
+            color: #333;
         }
-        .container {
-            width: 80%; /* 容器宽度为视口宽度的80% */
-            margin: auto; /* 水平居中显示 */
-            padding: 20px; /* 内边距 */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 轻微的阴影效果 */
-            background-color: #f8f8f8; /* 背景颜色 */
+        h1 {
+            color: #005a87;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);  /* Improve text readability */
+        }
+        form {
+            background: rgba(255, 255, 255, 0.9); /* 半透明背景，以便背景图片部分可见 */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        label, input, select, button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        input, select, button {
+            height: 40px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #005a87;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #004165;
+        }
+        #result {
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 4px;
+            background-color: #ebfbee;
+        }
+        .mcrColor { /* Additional class for changing text color when the result is MCR */
+            color: red;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to My Page</h1>
-        <p>This is a demonstration of displaying an image from the same folder as the HTML file.</p>
-        <!-- 显示图片 -->
-        <img src="figure.jpg" alt="Description of the image">
-    </div>
-</body>
+    <h1>MCR Decision Tree Classifier</h1>
+    <form id="classifierForm">
+        <label for="DepressiveSymptoms">Depressive Symptoms:</label>
+        <select id="DepressiveSymptoms">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+
+        <label for="EducationLevel">Education Level:</label>
+        <select id="EducationLevel">
+            <option value="PrimarySchoolAndAbove">Primary school and above</option>
+            <option value="Illiteracy">Illiteracy</option>
+        </select>
+
+        <label for="SocialEngagement">Social Engagement:</label>
+        <select id="SocialEngagement">
+            <option value="Regular">Regular</option>
+            <option value="Irregular">Irregular</option>
+        </select>
+
+        <label for="PhysicalActivityLevel">Physical Activity Level:</label>
+        <select id="PhysicalActivityLevel">
+            <option value="High">High</option>
+            <option value="LowOrModerate">Low or Moderate</option>
+        </select>
+
+        <label for="NutritionalStatus">Nutritional Status:</label>
+        <select id="NutritionalStatus">
+            <option value="NonMalnutrition">Non-malnutrition</option>
+            <option value="MalnutritionOrRisk">Malnutrition or Malnutrition risk</option>
+        </select>
+
+        <label for="PurposeInLife">Purpose in Life (<28 Points):</label>
+        <input type="number" id="PurposeInLife" value="22">
+
+        <label for="Age">Age (>=50 Years):</label>
+        <input type="number" id="Age" value="50">
+
+        <button type="button">Predict</button>
+    </form>
+
+    <p id="result"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector("button").addEventListener('click', function() {
+                var input = {
+                    DepressiveSymptoms: document.getElementById('DepressiveSymptoms').value,
+                    EducationLevel: document.getElementById('EducationLevel').value,
+                    NutritionalStatus: document.getElementById('NutritionalStatus').value,
+                    SocialEngagement: document.getElementById('SocialEngagement').value,
+                    PhysicalActivityLevel: document.getElementById('PhysicalActivityLevel').value,
+                    PurposeInLife: parseInt(document.getElementById('PurposeInLife').value, 10),
+                    Age: parseInt(document.getElementById('Age').value, 10)
+                };
+                var result = classify(input);
+                var resultElement = document.getElementById('result');
+                resultElement.textContent = 'Prediction: ' + result;
+                resultElement.classList.toggle('mcrColor', result === 'MCR'); // Change text color if result is MCR
+            });
+
+            function classify(input) {
+                if (input.DepressiveSymptoms === "Yes" && input.SocialEngagement === "Irregular") {
+                    return "MCR";
+                }
+                if (input.DepressiveSymptoms === "No" && 
+                    input.EducationLevel === "PrimarySchoolAndAbove" &&
+                    input.PurposeInLife >= 0 && input.PurposeInLife < 22 &&
+                    input.NutritionalStatus === "MalnutritionOrRisk" &&
+                    input.Age >= 50 && input.Age < 75) {
+                    return "MCR";
+                }
+                return "Non-MCR";
+            }
+        });
+    </script>
+</    body>
 </html>
